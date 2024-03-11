@@ -52,6 +52,9 @@ def handle_gpt_response(full_content):
 
 # Function to handle chat with user and then play response as audio
 def final_answer(info, chat_history, query):
+    if query is None:
+        print("Query is None. Skipping the request.")
+        return chat_history
     chat_history_str = str(chat_history)
     model_name = "llama-2-70b-chat"
     previous_content = ""  # Keep track of what content has already been processed
@@ -61,11 +64,12 @@ def final_answer(info, chat_history, query):
         {
             "role": "system",
             "content": (
-                '''You are a receptionist of a hotel, answer the user's query based on the provided info. You will also be provided with chat history
-                '''+  f'Chat History: {chat_history_str}' + f'Info: {info}'
+                '''You are a receptionist of a hotel, answer the user's query based on the provided info. You will also be provided with chat history ''' +  
+                f'Chat History: {str(chat_history) if chat_history else "No history available."}' + 
+                f'Info: {str(info) if info else "No additional info."}'
             )
         },
-        {"role": "user", "content": query}
+        {"role": "user", "content": query if query else "Default query text."}
     ]
 
     response_stream = openai.ChatCompletion.create(
